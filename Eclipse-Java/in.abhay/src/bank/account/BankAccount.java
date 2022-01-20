@@ -1,7 +1,7 @@
 package bank.account;
 
 public class BankAccount {
-
+	
 	private String Name;
 	private int AccountNumber;
 	private int InterestRate = 5;
