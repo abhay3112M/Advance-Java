@@ -1,4 +1,4 @@
-package in.conceptarchitect.banking.specs;
+package in.abhay.banking.specs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,7 +9,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import in.conceptarchitect.banking.Bank;
+import in.abhay.banking.Bank;
+import in.abhay.banking.Response;
+import in.abhay.banking.ResponseStatus;
 
 public class BankSpecs {
 	
@@ -126,7 +128,6 @@ public class BankSpecs {
 	}
 	
 	
-	@Ignore
 	@Test
 	public void closeAccountShouldReturnBalanceOnSuccessfulClosure() {
 		
@@ -173,7 +174,9 @@ public class BankSpecs {
 		bank.closeAccount(3, correctPassword); //we closed account 3
 		
 		//ACT
+		
 		var accountNumber= bank.openAccount(a5Name, correctPassword, initialBalance);
+		
 		
 		//ASSERT
 		assertEquals(5,accountNumber);
@@ -182,116 +185,157 @@ public class BankSpecs {
 		
 		assertEquals(a4Name, account4.getName());
 		
-		
-		
-		
-		
 	}
 	
 	
-	
-	@Ignore
 	@Test
 	public void weShouldNotBeAbleToGetClosedAccount() {
+		bank.closeAccount(existingAccount1, correctPassword);
+		
+		//ACT
+		var result=bank.getAccount(existingAccount1, correctPassword);		
+		
+		//ASSERT
+		assertTrue(result==null);
 		
 	}
-	
-	@Ignore
+
 	@Test
 	public void creditInterstShouldCreditInterstToAllAccounts() {
+		bank.creditInterest();
+		double updatedBalance = (initialBalance+(initialBalance*rate/1200));
+		double balance1 = bank.getBalance(existingAccount1, correctPassword);
+		double balance2 = bank.getBalance(existingAccount2, correctPassword);
+		assertEquals(balance1, updatedBalance,0.01);
+		assertEquals(balance2, updatedBalance,0.01);
 		
 	}
 	
-	@Ignore
 	@Test
 	public void getBalanceShouldReturnBalanceForCorrectAccountAndPassword() {
-		
+		double balance1 = bank.getBalance(existingAccount1, correctPassword);
+		assertEquals(balance1, initialBalance,0.01);
 	}
-	@Ignore
+	
 	@Test
 	public void getBalanceShouldFailForInvalidAccountNumber() {
-		
+		double balance = bank.getBalance(initialTotalAccounts+1, correctPassword);
+		assertTrue(balance==-1);
 	}
-	@Ignore
+	
 	@Test
 	public void getBalanceShouldFailForInvalidPassword() {
-		
+		double balance = bank.getBalance(existingAccount1, "Wrong-password");
+		assertTrue(balance==-1);
 	}
-	@Ignore
+	
+	
 	@Test
 	public void depositShouldFailForInvalidAccountNumber() {
-		
+		boolean response = bank.deposit(initialTotalAccounts+1,5000);
+		assertFalse(response);
 	}
-	@Ignore
+	
 	@Test
 	public void depositShouldFailForInvalidAmount() {
-		
+		boolean response = bank.deposit(existingAccount1,-23);
+		assertFalse(response);
 	}
-	@Ignore
+	
 	@Test
 	public void depositShouldCreditBalanceOnSuccess() {
+		boolean response = bank.deposit(existingAccount1,500);
+		assertTrue(response);
 		
+		double updatedBalance = initialBalance+500;
+		double balance = bank.getBalance(existingAccount1, correctPassword);
+		assertEquals(balance,updatedBalance,0.01);
 	}
-	@Ignore
+	
 	@Test
 	public void withdrawShouldFailForInvalidAccountNumber() {
-		
+		Response response = bank.withdraw(initialTotalAccounts+1, 500, correctPassword);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_CREDENTIALS);
 	}
-	@Ignore
+	
 	@Test
 	public void withdrawShouldFailForInvalidPassword() {
-		
+		Response response = bank.withdraw(existingAccount1, 500, "WrongPassword");
+		assertTrue(response.getCode()==ResponseStatus.INVALID_CREDENTIALS);
 	}
-	@Ignore
+	
 	@Test
 	public void withdrawShouldFailForInvalidAmount() {
-		
+		Response response = bank.withdraw(existingAccount1, -21, correctPassword);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_AMOUNT);
 	}
-	@Ignore
+
 	@Test
 	public void withdrawShouldFailForOverDraft() {
-		
-	}
-	@Ignore
-	@Test
-	public void withdrawShouldReduceBalanceByAmountOnSuccess() {
+		Response response = bank.withdraw(existingAccount1,(int)initialBalance+10, correctPassword);
+		assertTrue(response.getCode()==ResponseStatus.INSUFFICIENT_FUNDS);
 		
 	}
 	
-	@Ignore
+	@Test
+	public void withdrawShouldReduceBalanceByAmountOnSuccess() {
+		Response response = bank.withdraw(existingAccount1,13000, correctPassword);
+		assertTrue(response.getCode()==ResponseStatus.SUCCESS);
+		
+		double reducedBalance = initialBalance-13000;
+		double updatedBalance = bank.getBalance(existingAccount1, correctPassword);
+		assertEquals(reducedBalance,updatedBalance,0.01);
+		
+	}
+	
 	@Test
 	public void transferShouldFailForInvalidSourceAccountNumber() {
-		
+		Response response = bank.transfer(initialTotalAccounts+1,13000, correctPassword,existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_CREDENTIALS);
 	}
-	@Ignore
+	
 	@Test
 	public void transferShouldFailForInvalidPassword() {
-		
+		Response response = bank.transfer(existingAccount1,13000, "WrongPassword",existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_CREDENTIALS);
 	}
-	@Ignore
+	
 	@Test
 	public void transferShouldFailForInvalidAmount() {
-		
+		Response response = bank.transfer(existingAccount1,-9898, correctPassword,existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_AMOUNT);
 	}
-	@Ignore
+	
 	@Test
 	public void transferShouldFailForOverDraft() {
-		
+		Response response = bank.transfer(existingAccount1,(int)initialBalance+1200, correctPassword,existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.INSUFFICIENT_FUNDS);
 	}
-	@Ignore
+
 	@Test
 	public void transferShouldReduceBalanceInSourceAccountOnSuccess() {
+		Response response = bank.transfer(existingAccount1,13000, correctPassword,existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.SUCCESS);
 		
+		double reducedBalance = initialBalance-13000;
+		double updatedBalance = bank.getBalance(existingAccount1, correctPassword);
+		assertEquals(reducedBalance,updatedBalance,0.01);
 	}
-	@Ignore
+	
 	@Test
 	public void transferShouldFailForInvalidTargetAccountNumber() {
-		
+		Response response = bank.transfer(existingAccount1,13000, correctPassword,initialTotalAccounts+1);
+		assertTrue(response.getCode()==ResponseStatus.INVALID_CREDENTIALS);
 	}
-	@Ignore
+	
 	@Test
 	public void transferShouldAddBalanceInTargetOnSuccess() {
+		Response response = bank.transfer(existingAccount1,13000, correctPassword,existingAccount2);
+		assertTrue(response.getCode()==ResponseStatus.SUCCESS);
 		
+		double increasedBalance = initialBalance+13000;
+		double updatedBalance = bank.getBalance(existingAccount2, correctPassword);
+		assertEquals(increasedBalance,updatedBalance,0.01);
 	}
 	
 	

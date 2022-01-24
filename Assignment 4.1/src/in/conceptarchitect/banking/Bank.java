@@ -24,12 +24,15 @@ public class Bank {
 	}
 	
 	int accountCount=0;	
+	int totalAccountCount=0;
 	BankAccount [] accounts=new BankAccount[100];
 
 
 	public int openAccount(String name, String password, double amount) {
 		// TODO Auto-generated method stub
-		int accountNumber= ++accountCount;
+		
+		int accountNumber= ++totalAccountCount;
+		++accountCount;
 		var account=new BankAccount(accountNumber, name,password,amount);
 		accounts[accountNumber]=account;
 		return accountNumber;
@@ -56,9 +59,13 @@ public class Bank {
 
 	public BankAccount getAccount(int accountNumber, String password) {
 		// TODO Auto-generated method stub
-		
-		
+		BankAccount account=accounts[accountNumber];
+		if(account.authenticate(password))
+		{
+			return account;
+		}
 		return null;
+	
 	}
 
 	

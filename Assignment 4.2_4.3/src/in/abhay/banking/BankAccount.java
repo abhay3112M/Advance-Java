@@ -1,7 +1,6 @@
-package in.conceptarchitect.banking;
+package in.abhay.banking;
 
-//import in.conceptarchitect.utils.Input;
-import in.conceptarchitect.utils.encryption.Encrypt;
+import in.abhay.utils.Encrypt;
 
 public class BankAccount {
 	
@@ -48,8 +47,7 @@ public class BankAccount {
 			return new Response(ResponseStatus.INVALID_AMOUNT,"Enter Positive Amount");
 		if(amount>balance)
 			return new Response(ResponseStatus.INSUFFICIENT_FUNDS,"Insufficient Funds");
-		
-		
+		balance-=amount;
 		return new Response(ResponseStatus.SUCCESS,null);
 	}
 	
