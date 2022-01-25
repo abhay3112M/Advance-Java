@@ -29,8 +29,8 @@ public class BankSpecs {
 	public void arrange() {
 		//ARRANGE
 		bank=new Bank(bankName,rate);
-		existingAccount1=bank.openAccount("Name1", correctPassword, initialBalance,accountType);
-		existingAccount2=bank.openAccount("Name", correctPassword, initialBalance,accountType);
+		existingAccount1=bank.openAccount("Name1", correctPassword, initialBalance,1);
+		existingAccount2=bank.openAccount("Name", correctPassword, initialBalance,2);
 		initialTotalAccounts=bank.getAccountCount();
 	}
 	
@@ -208,13 +208,13 @@ public class BankSpecs {
 		double updatedBalance1 = (initialBalance+(initialBalance*rate1/1200));
 		double balance1 = bank.getBalance(existingAccount1, correctPassword);
 		
-		double rate2 = bank.getInterest(existingAccount1,correctPassword);
+		double rate2 = bank.getInterest(existingAccount2,correctPassword);
 		double updatedBalance2 = (initialBalance+(initialBalance*rate2/1200));
 		double balance2 = bank.getBalance(existingAccount2, correctPassword);
 		
 		assertEquals(updatedBalance1,balance1,1);
-		assertEquals(updatedBalance2,balance2,1);
-		
+		assertEquals(initialBalance,balance2,0.01);
+		System.out.println(rate2);
 	}
 	
 	@Test
