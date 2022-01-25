@@ -18,9 +18,6 @@ public class EmployeeTest {
 	@Before
 	public void arrange() {
 		employee=new Employee(id,name,salary);
-		employee.setId(id);
-		employee.setName(name);
-		employee.setSalary(salary);
 	}
 	
 	@Test
