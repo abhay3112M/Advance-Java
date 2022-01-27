@@ -57,7 +57,7 @@ public class Bank {
 	public double closeAccount(int accountNumber, String password) {
 		// TODO Auto-generated method stub
 		var account=getAccount(accountNumber,password);
-		if(account==null)
+		if(account==null || account.getBalance()<0)
 			return -1;
 		
 		accounts[accountNumber]=null;
