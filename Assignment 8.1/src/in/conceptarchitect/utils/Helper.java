@@ -6,7 +6,7 @@ import in.conceptarchitect.banking.BankAccount;
 import in.conceptarchitect.banking.CurrentAccount;
 
 public class Helper {
-	
+
 	public ArrayList<BankAccount> currentAccounts(ArrayList<BankAccount> accounts) {
 		ArrayList<BankAccount> resultAccount= new ArrayList<BankAccount>();
 		for(BankAccount account : accounts) {
